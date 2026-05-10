@@ -1,0 +1,24 @@
+# 1. Start with Ubuntu 22.04
+FROM ubuntu:22.04
+
+# 2. Install essential tools + ttyd (web terminal) + sudo
+USER root
+RUN apt-get update && apt-get install -y \
+    curl git vim wget python3 sudo ttyd \
+    && rm -rf /var/lib/apt/lists/*
+
+# 3. Create 'user' and give them SUDO powers (so you can install OpenClaw later!)
+RUN useradd -m -u 1000 user && \
+    echo "user ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+
+# 4. Set the workspace
+WORKDIR /home/user
+
+# 5. Switch to the non-root user (Required by Hugging Face)
+USER user
+
+# 6. Start ttyd with a built-in password
+# REPLACE 'user:yourpassword' with your desired username and password!
+# Format is 'username:password'
+EXPOSE 7860
+CMD ["ttyd", "-p", "7860", "-c", "user:author9", "bash"]
